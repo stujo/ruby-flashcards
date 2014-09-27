@@ -1,5 +1,8 @@
 require 'pathname'
+require 'pry'
+require_relative 'exception'
 require_relative 'logger'
+require_relative 'command'
 require_relative 'card'
 require_relative 'game'
 require_relative 'view'
@@ -14,13 +17,11 @@ module Flashcards
 
     def initialize
       @game  = Game.new('animals.deck')
-      @controller = Controller.new(@game)
-      @view = View.new(@game)
+      @controller = Controller.new(@game, View.new)
     end
 
     def run
-      puts "Flashcards"
-      @controller.run_menu(@view)
+      @controller.run_menu
     end
   end
 end

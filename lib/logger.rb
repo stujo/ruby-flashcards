@@ -1,13 +1,12 @@
 module Flashcards
   class Logger
 
-    DEBUGGING_ENABLED = true
-    LOGGING_ENABLED = true
+    DEBUGGING_ENABLED = false
+    LOGGING_ENABLED = false
 
     def self.log message, *args
       if LOGGING_ENABLED
         puts "LOG  :#{message}"
-        puts message
         p args unless args.nil? || args.empty?
       end
     end
