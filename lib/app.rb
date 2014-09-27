@@ -1,5 +1,5 @@
 require 'pathname'
-require 'pry'
+
 require_relative 'exception'
 require_relative 'logger'
 require_relative 'command'
