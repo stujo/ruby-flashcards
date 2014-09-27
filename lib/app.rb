@@ -21,7 +21,7 @@ module Flashcards
     end
 
     def run
-      @controller.run_menu
+      @controller.start
     end
   end
 end

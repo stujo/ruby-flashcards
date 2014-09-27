@@ -5,20 +5,23 @@ module Flashcards
       @view = view
     end
 
-    def run_menu action = :welcome
-      while action = dispatch_command(action)
+    def start action = :welcome
+      while next_action = dispatch_command(action)
+        action = next_action
       end
+      Logger.debug("run_menu exiting", action)
     end
 
     def dispatch_command action
+      @previous_command = @command
       @command = Command.commandize action
-      Logger.log("Dispatching", @command)
+      Logger.debug("Dispatching", @command)
       if respond_to?(@command.action_method)
         result = self.send(@command.action_method, @command.params)
       else
         result = action_help({unknown_command: action})
       end
-      result.tap{|res| Logger.log("dispatch_command #{@command.action} -> #{res}")}
+      result.tap {|res| Logger.debug("dispatch_command #{@command.action} -> #{res}")}
     end
 
     def action_welcome params
@@ -30,10 +33,10 @@ module Flashcards
     end
 
     def action_skip params
-      :next
+      :continue
     end
 
-    def action_next params
+    def action_continue params
       if @game.has_more_cards
         @game.next_card
         :card
@@ -44,20 +47,19 @@ module Flashcards
 
     def action_default params
       if @game.current_card.solved?
-        :next
+        :continue
       else
         :card
       end
     end
 
     def action_help params
-      @view.show_help params
-      :default
+      @view.show_help params[:arg], params[:unknown_command], params[:raw]
     end
 
     def action_guess params
       if @game.current_card.try_answer params[:input]
-        :next
+        :continue
       else
         :card
       end
@@ -73,5 +75,27 @@ module Flashcards
       false
     end
 
+    def go_back_command
+      target = :help
+      if @previous_command
+        target, @previous_command = @previous_command, nil
+      end
+      target
+    end
+
+    def action_debugging params
+      Logger.debugging
+      go_back_command
+    end
+
+    def action_logging params
+      Logger.logging
+      go_back_command
+    end
+
+    def action_no_logging params
+      Logger.off
+      go_back_command
+    end
   end
 end
